@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Strings — Xperi Interview Prep</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ── Design intent ──────────────────────────────────────────
+   Emotion: Focused intensity — like a scholar's lamp at night
+   Metaphor: Aged manuscript meets precision engineering
+   Unexpected detail: Vertical section numbers + sepia-gold accent
+   Color: Editorial Warm — parchment on charcoal
+─────────────────────────────────────────────────────────── */
+
+:root {
+  --bg:      #0e0c09;
+  --surface: #171410;
+  --surface2:#1f1b16;
+  --accent:  #c9a84c;
+  --accent2: #8b6914;
+  --text:    #ede8df;
+  --muted:   #6b6050;
+  --faint:   #2a2520;
+  --code-bg: #13110e;
+  --code-text:#d4b896;
+  --easy:    #5a8a5a;
+  --medium:  #a07830;
+  --hard:    #8a3a3a;
+  --easy-t:  #7fbf7f;
+  --medium-t:#e0a840;
+  --hard-t:  #e06060;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Grain overlay ─────────────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: -200%;
+  width: 400%; height: 400%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.04;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ── Navigation ────────────────────────────────────────── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.4rem clamp(1.5rem, 5vw, 4rem);
+  z-index: 100;
+  border-bottom: 1px solid rgba(201,168,76,0.08);
+  background: rgba(14,12,9,0.85);
+  backdrop-filter: blur(20px);
+}
+.nav-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: 0.05em;
+  text-decoration: none;
+}
+.nav-links {
+  display: flex;
+  gap: 2.5rem;
+  list-style: none;
+}
+.nav-links a {
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+.nav-links a:hover { color: var(--accent); }
+
+/* ── Hero ─────────────────────────────────────────────── */
+.hero {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  padding-top: 80px;
+  border-bottom: 1px solid var(--faint);
+}
+.hero-side {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 3rem 0 3rem 2.5rem;
+  border-right: 1px solid var(--faint);
+}
+.vertical-text {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-size: 0.62rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.hero-main {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: clamp(2rem,6vw,5rem) clamp(2rem,6vw,5rem) clamp(3rem,7vw,6rem);
+}
+.hero-label {
+  font-size: 0.68rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.2s forwards;
+}
+.hero-label::before {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 1px;
+  background: var(--accent);
+}
+h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(4rem, 11vw, 9.5rem);
+  font-weight: 700;
+  line-height: 0.88;
+  letter-spacing: -0.03em;
+  color: var(--text);
+  opacity: 0;
+  animation: fadeUp 1s ease 0.4s forwards;
+}
+h1 em {
+  font-style: italic;
+  color: var(--accent);
+}
+.hero-sub {
+  margin-top: 2.5rem;
+  max-width: 540px;
+  font-size: clamp(0.95rem, 1.5vw, 1.05rem);
+  line-height: 1.75;
+  color: var(--muted);
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.65s forwards;
+}
+.hero-meta {
+  margin-top: 3rem;
+  display: flex;
+  gap: 3rem;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.85s forwards;
+}
+.meta-item { display: flex; flex-direction: column; gap: 0.3rem; }
+.meta-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: var(--accent);
+  line-height: 1;
+}
+.meta-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ── Scroll reveal ─────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(32px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.16,1,0.3,1);
+}
+[data-reveal].in-view { opacity: 1; transform: none; }
+[data-reveal][data-delay="1"] { transition-delay: 0.08s; }
+[data-reveal][data-delay="2"] { transition-delay: 0.18s; }
+[data-reveal][data-delay="3"] { transition-delay: 0.28s; }
+[data-reveal][data-delay="4"] { transition-delay: 0.38s; }
+
+/* ── Section scaffold ──────────────────────────────────── */
+.section {
+  width: 100%;
+  padding: clamp(4rem,9vw,8rem) clamp(1.5rem,5vw,4rem);
+  border-bottom: 1px solid var(--faint);
+}
+.section-inner { max-width: 1200px; margin: 0 auto; }
+.section-eyebrow {
+  font-size: 0.65rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-bottom: 2.5rem;
+}
+.section-eyebrow::after {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 1px;
+  background: var(--accent);
+}
+h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2rem, 5vw, 3.8rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  color: var(--text);
+  margin-bottom: 1.5rem;
+}
+h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.3rem, 2.5vw, 1.9rem);
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 1rem;
+  letter-spacing: -0.01em;
+}
+p {
+  font-size: clamp(0.92rem, 1.4vw, 1rem);
+  line-height: 1.8;
+  color: var(--muted);
+}
+
+/* ── Xperi confirmed banner ────────────────────────────── */
+.xperi-confirmed {
+  background: linear-gradient(135deg, rgba(201,168,76,0.12), rgba(139,105,20,0.08));
+  border: 1px solid rgba(201,168,76,0.25);
+  border-radius: 4px;
+  padding: 1.4rem 2rem;
+  margin-bottom: 3.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+.confirmed-dot {
+  width: 8px; height: 8px;
+  background: var(--accent);
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 12px rgba(201,168,76,0.5);
+  animation: pulse 2.5s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,100% { box-shadow: 0 0 12px rgba(201,168,76,0.4); }
+  50%      { box-shadow: 0 0 24px rgba(201,168,76,0.8); }
+}
+.confirmed-text {
+  font-size: 0.88rem;
+  color: var(--text);
+  line-height: 1.6;
+}
+.confirmed-text strong { color: var(--accent); }
+
+/* ── Patterns grid ─────────────────────────────────────── */
+.patterns-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1px;
+  background: var(--faint);
+  border: 1px solid var(--faint);
+  margin-top: 2rem;
+}
+.pattern-card {
+  background: var(--surface);
+  padding: 2rem 1.8rem;
+  transition: background 0.3s ease;
+  cursor: default;
+}
+.pattern-card:hover { background: var(--surface2); }
+.pattern-icon {
+  font-size: 1.6rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+.pattern-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.6rem;
+}
+.pattern-when {
+  font-size: 0.8rem;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: 0.8rem;
+}
+.pattern-examples {
+  font-size: 0.72rem;
+  color: var(--accent);
+  letter-spacing: 0.05em;
+}
+
+/* ── Java String basics ────────────────────────────────── */
+.basics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+@media (max-width: 700px) { .basics-grid { grid-template-columns: 1fr; } }
+.basics-card {
+  background: var(--surface);
+  border: 1px solid var(--faint);
+  padding: 1.8rem;
+  border-radius: 2px;
+}
+.basics-card h4 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 1rem;
+  letter-spacing: 0.02em;
+}
+
+/* ── Code block ────────────────────────────────────────── */
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--faint);
+  border-left: 3px solid var(--accent2);
+  border-radius: 2px;
+  padding: 1.4rem 1.6rem;
+  overflow-x: auto;
+  margin: 1rem 0 0;
+}
+code {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.8rem;
+  line-height: 1.75;
+  color: var(--code-text);
+}
+.c-comment { color: #5a5040; font-style: italic; }
+.c-keyword  { color: #c9a84c; }
+.c-type     { color: #a08060; }
+.c-string   { color: #8fb070; }
+.c-num      { color: #d0a060; }
+.c-method   { color: #d4b896; }
+
+/* ── Questions ─────────────────────────────────────────── */
+.questions-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.question-block {
+  border-bottom: 1px solid var(--faint);
+  padding: 3rem 0;
+}
+.question-block:last-child { border-bottom: none; }
+.q-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.q-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--faint);
+  line-height: 1;
+  flex-shrink: 0;
+  width: 70px;
+  text-align: right;
+  padding-top: 0.1rem;
+  transition: color 0.3s;
+}
+.question-block:hover .q-num { color: var(--accent2); }
+.q-meta { flex: 1; }
+.q-top {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+.q-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.2rem, 2.5vw, 1.7rem);
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.badge {
+  padding: 0.25em 0.9em;
+  border-radius: 2px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+.badge-easy   { background: rgba(90,138,90,0.2);  color: var(--easy-t);   border: 1px solid rgba(90,138,90,0.4); }
+.badge-medium { background: rgba(160,120,48,0.2); color: var(--medium-t); border: 1px solid rgba(160,120,48,0.4); }
+.badge-hard   { background: rgba(138,58,58,0.2);  color: var(--hard-t);   border: 1px solid rgba(138,58,58,0.4); }
+.badge-xperi  { background: rgba(201,168,76,0.15); color: var(--accent);  border: 1px solid rgba(201,168,76,0.35); }
+
+.q-problem {
+  font-size: 0.93rem;
+  color: var(--muted);
+  line-height: 1.75;
+  margin-bottom: 1rem;
+}
+.q-section-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+  margin-top: 1.2rem;
+}
+.q-approach {
+  font-size: 0.92rem;
+  color: var(--text);
+  line-height: 1.75;
+  background: var(--surface);
+  border-left: 2px solid var(--accent);
+  padding: 0.9rem 1.2rem;
+  margin-bottom: 0.5rem;
+}
+.q-footer {
+  display: flex;
+  gap: 2rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--faint);
+  flex-wrap: wrap;
+}
+.q-tc, .q-sc {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.q-tc span, .q-sc span {
+  color: var(--accent);
+  font-family: 'DM Mono', monospace;
+  font-size: 0.82rem;
+}
+.q-tip {
+  font-size: 0.82rem;
+  color: var(--text);
+  background: rgba(201,168,76,0.07);
+  border: 1px solid rgba(201,168,76,0.15);
+  padding: 0.7rem 1rem;
+  margin-top: 0.8rem;
+  line-height: 1.65;
+  border-radius: 2px;
+}
+.q-tip::before {
+  content: '◆  ';
+  color: var(--accent);
+  font-size: 0.6rem;
+}
+
+/* ── Content divider ───────────────────────────────────── */
+.diff-divider {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 2rem 0 0;
+  margin-bottom: 0.5rem;
+}
+.diff-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--faint);
+}
+.diff-line { flex: 1; height: 1px; background: var(--faint); }
+
+/* ── Cheatsheet ────────────────────────────────────────── */
+.cheat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1px;
+  background: var(--faint);
+  border: 1px solid var(--faint);
+  margin-top: 2rem;
+}
+.cheat-card {
+  background: var(--surface);
+  padding: 1.8rem;
+  transition: background 0.25s;
+}
+.cheat-card:hover { background: var(--surface2); }
+.cheat-problem {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+.cheat-pattern {
+  font-size: 0.8rem;
+  color: var(--accent);
+  margin-bottom: 0.25rem;
+  font-family: 'DM Mono', monospace;
+}
+.cheat-tc {
+  font-size: 0.74rem;
+  color: var(--muted);
+}
+
+/* ── Footer ────────────────────────────────────────────── */
+footer {
+  padding: clamp(3rem,7vw,6rem) clamp(1.5rem,5vw,4rem);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+.footer-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2rem,5vw,4rem);
+  font-weight: 700;
+  color: var(--faint);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  transition: color 0.5s;
+}
+.footer-name:hover { color: var(--accent2); }
+.footer-right { text-align: right; }
+.footer-right p {
+  font-size: 0.72rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  line-height: 2;
+}
+
+/* ── Mobile ────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .hero { grid-template-columns: 1fr; }
+  .hero-side { display: none; }
+  .nav-links { display: none; }
+  .q-header { flex-direction: column; gap: 0.5rem; }
+  .q-num { font-size: 2rem; width: auto; text-align: left; }
+  .basics-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+  <a class="nav-logo" href="#">Strings × Xperi</a>
+  <ul class="nav-links">
+    <li><a href="#patterns">Patterns</a></li>
+    <li><a href="#basics">Java Basics</a></li>
+    <li><a href="#questions">Problems</a></li>
+    <li><a href="#cheatsheet">Cheatsheet</a></li>
+  </ul>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-side">
+    <span class="vertical-text">Xperi Interview Prep — June 2026</span>
+  </div>
+  <div class="hero-main">
+    <div class="hero-label">DSA Prep Series / Volume III</div>
+    <h1>String<br><em>Mastery</em></h1>
+    <p class="hero-sub">
+      Every pattern, every problem Xperi has asked — from reversals to palindromic DP.
+      Confirmed from real interview experiences and deep research.
+    </p>
+    <div class="hero-meta">
+      <div class="meta-item">
+        <span class="meta-num">15</span>
+        <span class="meta-label">Problems Solved</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-num">6</span>
+        <span class="meta-label">Core Patterns</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-num">2</span>
+        <span class="meta-label">Xperi Confirmed</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Patterns -->
+<section class="section" id="patterns">
+  <div class="section-inner">
+    <div class="section-eyebrow" data-reveal>01 — Core Patterns</div>
+    <h2 data-reveal data-delay="1">Six Patterns.<br>Ninety percent of questions.</h2>
+
+    <div class="xperi-confirmed" data-reveal data-delay="2">
+      <div class="confirmed-dot"></div>
+      <div class="confirmed-text">
+        <strong>Xperi Confirmed:</strong> "Minimum deletions to make string palindrome" and "Remove adjacent duplicates using Stack" — both directly asked at Xperi Bangalore (Feb 2025). The first maps to <strong>String DP</strong>, second to <strong>Stack pattern</strong>.
+      </div>
+    </div>
+
+    <div class="patterns-grid">
+      <div class="pattern-card" data-reveal data-delay="1">
+        <span class="pattern-icon">↔</span>
+        <div class="pattern-name">Two Pointers</div>
+        <div class="pattern-when">Jab problem palindrome check, in-place reversal, ya string comparison ho — left aur right se aate hain.</div>
+        <div class="pattern-examples">Reverse String · Valid Palindrome · Palindrome II</div>
+      </div>
+      <div class="pattern-card" data-reveal data-delay="2">
+        <span class="pattern-icon">⧉</span>
+        <div class="pattern-name">Sliding Window</div>
+        <div class="pattern-when">Substring with constraint — fixed ya variable window. Longest, shortest, with K distinct chars.</div>
+        <div class="pattern-examples">Longest No Repeat · Min Window · Longest Repeating</div>
+      </div>
+      <div class="pattern-card" data-reveal data-delay="3">
+        <span class="pattern-icon">#</span>
+        <div class="pattern-name">HashMap / Frequency</div>
+        <div class="pattern-when">Anagram family, character counting, first unique char — har baar freq map banao.</div>
+        <div class="pattern-examples">Valid Anagram · Group Anagrams · First Unique Char</div>
+      </div>
+      <div class="pattern-card" data-reveal data-delay="4">
+        <span class="pattern-icon">▤</span>
+        <div class="pattern-name">Stack</div>
+        <div class="pattern-when">Adjacent duplicates, balanced parentheses, decode string — stack LIFO nature kaafi kaam aata hai.</div>
+        <div class="pattern-examples">Remove Adj Duplicates · Valid Parens · Decode String</div>
+      </div>
+      <div class="pattern-card" data-reveal data-delay="1">
+        <span class="pattern-icon">◉</span>
+        <div class="pattern-name">Expand Around Center</div>
+        <div class="pattern-when">Palindromic substrings — har character ko center manke expand karo. O(n²) optimal.</div>
+        <div class="pattern-examples">Longest Palindromic Substr · Palindromic Substrings</div>
+      </div>
+      <div class="pattern-card" data-reveal data-delay="2">
+        <span class="pattern-icon">⊞</span>
+        <div class="pattern-name">String DP</div>
+        <div class="pattern-when">LCS, Edit Distance, minimum operations — yeh Xperi mein directly pucha gaya hai!</div>
+        <div class="pattern-examples">Min Deletions Palindrome · LCS · Edit Distance</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Java String Basics -->
+<section class="section" id="basics">
+  <div class="section-inner">
+    <div class="section-eyebrow" data-reveal>02 — Java String Basics</div>
+    <h2 data-reveal data-delay="1">Things you must<br>know cold.</h2>
+
+    <div class="basics-grid">
+      <div class="basics-card" data-reveal data-delay="1">
+        <h4>String Immutability</h4>
+        <p style="margin-bottom:0.8rem">Java mein String immutable hai — har modification new object banata hai. Loop mein String concatenation O(n²) ho jaata hai. Isliye StringBuilder use karo!</p>
+        <pre><code><span class="c-comment">// Bad — O(n²)</span>
+<span class="c-type">String</span> result = <span class="c-string">""</span>;
+<span class="c-keyword">for</span> (char c : arr) result += c;
+
+<span class="c-comment">// Good — O(n)</span>
+<span class="c-type">StringBuilder</span> sb = <span class="c-keyword">new</span> <span class="c-type">StringBuilder</span>();
+<span class="c-keyword">for</span> (char c : arr) sb.append(c);
+<span class="c-type">String</span> result = sb.toString();</code></pre>
+      </div>
+
+      <div class="basics-card" data-reveal data-delay="2">
+        <h4>Key String Methods</h4>
+        <pre><code>s.length()          <span class="c-comment">// length</span>
+s.charAt(i)         <span class="c-comment">// char at index</span>
+s.toCharArray()     <span class="c-comment">// char[] — for loops</span>
+s.indexOf(<span class="c-string">"x"</span>)      <span class="c-comment">// first occurrence</span>
+s.substring(i, j)   <span class="c-comment">// [i, j)</span>
+s.equals(t)         <span class="c-comment">// NOT ==</span>
+s.equalsIgnoreCase(t)
+s.toLowerCase()
+s.toUpperCase()
+s.trim()            <span class="c-comment">// remove whitespace</span>
+s.split(<span class="c-string">" "</span>)        <span class="c-comment">// String[]</span>
+s.replace(<span class="c-string">'a'</span>,<span class="c-string">'b'</span>)  <span class="c-comment">// char replace</span>
+s.contains(<span class="c-string">"abc"</span>)  <span class="c-comment">// boolean</span></code></pre>
+      </div>
+
+      <div class="basics-card" data-reveal data-delay="3">
+        <h4>char ↔ int Tricks</h4>
+        <pre><code><span class="c-comment">// char to int (frequency index)</span>
+<span class="c-keyword">int</span> idx = c - <span class="c-string">'a'</span>;   <span class="c-comment">// 0–25</span>
+
+<span class="c-comment">// int to char</span>
+<span class="c-keyword">char</span> c = (<span class="c-keyword">char</span>)(idx + <span class="c-string">'a'</span>);
+
+<span class="c-comment">// Check if lowercase</span>
+<span class="c-type">Character</span>.isLowerCase(c);
+<span class="c-type">Character</span>.isUpperCase(c);
+<span class="c-type">Character</span>.isDigit(c);
+<span class="c-type">Character</span>.isLetterOrDigit(c);
+
+<span class="c-comment">// Frequency array — faster than HashMap</span>
+<span class="c-keyword">int</span>[] freq = <span class="c-keyword">new</span> <span class="c-keyword">int</span>[26];
+<span class="c-keyword">for</span> (char c : s.toCharArray())
+    freq[c - <span class="c-string">'a'</span>]++;</code></pre>
+      </div>
+
+      <div class="basics-card" data-reveal data-delay="4">
+        <h4>String vs StringBuilder</h4>
+        <pre><code><span class="c-comment">// StringBuilder methods</span>
+sb.append(str)
+sb.insert(idx, str)
+sb.delete(i, j)
+sb.reverse()         <span class="c-comment">// in-place!</span>
+sb.toString()
+sb.length()
+sb.charAt(i)
+sb.setCharAt(i, c)
+
+<span class="c-comment">// Check palindrome using reverse</span>
+<span class="c-type">StringBuilder</span> sb = <span class="c-keyword">new</span> <span class="c-type">StringBuilder</span>(s);
+<span class="c-keyword">boolean</span> isPalin = s.equals(sb.reverse().toString());</code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Questions -->
+<section class="section" id="questions">
+  <div class="section-inner">
+    <div class="section-eyebrow" data-reveal>03 — 15 Solved Problems</div>
+    <h2 data-reveal data-delay="1">Every problem<br>Xperi can throw at you.</h2>
+
+    <div class="questions-layout">
+
+      <!-- EASY DIVIDER -->
+      <div class="diff-divider" data-reveal>
+        <span class="diff-label">Easy</span>
+        <span class="diff-line"></span>
+        <span class="badge badge-easy">Q1 – Q5</span>
+      </div>
+
+      <!-- Q1 -->
+      <div class="question-block" data-reveal>
+        <div class="q-header">
+          <div class="q-num">01</div>
+          <div class="q-meta">
+            <div class="q-top">
+              <span class="q-title">Reverse a String</span>
+              <span class="badge badge-easy">Easy</span>
+              <span class="badge badge-xperi">Xperi Asked</span>
+            </div>
+            <p class="q-problem">Ek character array s[] ko in-place reverse karo. Extra array use mat karo. Input: ['h','e','l','l','o'] → Output: ['o','l','l','e','h']</p>
+            <div class="q-section-label">Approach</div>
+            <div class="q-approach">Two Pointers — left = 0, right = n-1. Swap karo aur dono ko andar laao jab tak milte nahi.</div>
+            <pre><code><span class="c-keyword">void</span> reverseString(<span class="c-keyword">char</span>[] s) {
+    <span class="c-keyword">int</span> left = 0, right = s.length - 1;
+    <span class="c-keyword">while</span> (left < right) {
+        <span class="c-keyword">char</span> tmp = s[left];
+        s[left]  = s[right];
+        s[right] = tmp;
+        left++;
+        right--;
+    }
+}</code></pre>
+            <div class="q-footer">
+              <div class="q-tc">Time <span>O(n)</span></div>
+              <div class="q-sc">Space <span>O(1)</span></div>
+            </div>
+            <div class="q-tip">Xperi ka exact question: "Reverse the String in O(1) space." Yahi solution hai — do not use new array ya StringBuilder!</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="question-block" data-reveal>
+        <div class="q-header">
+          <div class="q-num">02</div>
+          <div class="q-meta">
+            <div class="q-top">
+              <span class="q-title">Valid Palindrome</span>
+              <span class="badge badge-easy">Easy</span>
+            </div>
+            <p class="q-problem">Ek string palindrome hai ya nahi check karo — sirf alphanumeric characters consider karo, case-insensitive.</p>
+            <div class="q-section-label">Approach</div>
+            <div class="q-approach">Two Pointers — non-alphanumeric skip karo. Left aur right ka lowercase compare karo.</div>
+            <pre><code><span class="c-keyword">boolean</span> isPalindrome(<span class="c-type">String</span> s) {
+    <span class="c-keyword">int</span> left = 0, right = s.length() - 1;
+    <span class="c-keyword">while</span> (left < right) {
+        <span class="c-comment">// skip non-alphanumeric</span>
+        <span class="c-keyword">while</span> (left < right && !Character.isLetterOrDigit(s.charAt(left)))
+            left++;
+        <span class="c-keyword">while</span> (left < right && !Character.isLetterOrDigit(s.charAt(right)))
+            right--;
+        <span class="c-keyword">if</span> (Character.toLowerCase(s.charAt(left)) !=
+            Character.toLowerCase(s.charAt(right)))
+            <span class="c-keyword">return false</span>;
+        left++; right--;
+    }
+    <span class="c-keyword">return true</span>;
+}</code></pre>
+            <div class="q-footer">
+              <div class="q-tc">Time <span>O(n)</span></div>
+              <div class="q-sc">Space <span>O(1)</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="question-block" data-reveal>
+        <div class="q-header">
+          <div class="q-num">03</div>
+          <div class="q-meta">
+            <div class="q-top">
+              <span class="q-title">Valid Anagram</span>
+              <span class="badge badge-easy">Easy</span>
+            </div>
+            <p class="q-problem">Do strings s aur t anagrams hain ya nahi check karo (same characters, same frequencies).</p>
+            <div class="q-section-label">Approach</div>
+            <div class="q-approach">Frequency array [26] — s ke chars increment karo, t ke chars decrement karo. Agar sab zero hain = anagram.</div>
+            <pre><code><span class="c-keyword">boolean</span> isAnagram(<span class="c-type">String</span> s, <span class="c-type">String</span> t) {
+    <span class="c-keyword">if</span> (s.length() != t.length()) <span class="c-keyword">return false</span>;
+    <span class="c-keyword">int</span>[] freq = <span class="c-keyword">new</span> <span class="c-keyword">int</span>[26];
+    <span class="c-keyword">for</span> (<span class="c-keyword">int</span> i = 0; i < s.length(); i++) {
+        freq[s.charAt(i) - <span class="c-string">'a'</span>]++;
+        freq[t.charAt(i) - <span class="c-string">'a'</span>]--;
+    }
+    <span class="c-keyword">for</span> (<span class="c-keyword">int</span> f : freq)
+        <span class="c-keyword">if</span> (f != 0) <span class="c-keyword">return false</span>;
+    <span class="c-keyword">return true</span>;
+}</code></pre>
+            <div class="q-footer">
+              <div class="q-tc">Time <span>O(n)</span></div>
+              <div class="q-sc">Space <span>O(1)</span> — fixed 26</div>
+            </div>
+            <div class="q-tip">Frequency array [26] HashMap se faster hai for lowercase-only strings — interviewer ko yeh bolo!</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="question-block" data-reveal>
+        <div class="q-header">
+          <div class="q-num">04</div>
+          <div class="q-meta">
+            <div class="q-top">
+              <span class="q-title">First Unique Character</span>
+              <span class="badge badge-easy">Easy</span>
+            </div>
+            <p class="q-problem">String mein pehla non-repeating character ka index nikalo. Nahi mila toh -1 return karo.</p>
+            <div class="q-section-label">Approach</div>
+            <div class="q-approach">Two-pass — pehle frequency count karo, phir left se scan karo pehla char jiska freq = 1 milega.</div>
+            <pre><code><span class="c-keyword">int</span> firstUniqChar(<span class="c-type">String</span> s) {
+    <span class="c-keyword">int</span>[] freq = <span class="c-keyword">new</span> <span class="c-keyword">int</span>[26];
+    <span class="c-keyword">for</span> (<span class="c-keyword">char</span> c : s.toCharArray()) freq[c - <span class="c-string">'a'</span>]++;
+    <span class="c-keyword">for</span> (<span class="c-keyword">int</span> i = 0; i < s.length(); i++)
+        <span class="c-keyword">if</span> (freq[s.charAt(i) - <span class="c-string">'a'</span>] == 1) <span class="c-keyword">return</span> i;
+    <span class="c-keyword">return</span> -1;
+}</code></pre>
+            <div class="q-footer">
+              <div class="q-tc">Time <span>O(n)</span></div>
+              <div class="q-sc">Space <span>O(1)</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q5 -->
+      <div class="question-block" data-reveal>
+        <div class="q-header">
+          <div class="q-num">05</div>
+          <div class="q-meta">
+            <div class="q-top">
+              <span class="q-title">Reverse Words in a String</span>
+              <span class="badge badge-easy">Easy</span>
+            </div>
+            <p class="q-problem">String ke words ko reverse order mein return karo. Extra spaces remove karo.</p>
+            <div class="q-section-label">Approach</div>
+            <div class="q-approach">Split by spaces → filter empty → reverse array → join. Ya two-pointer in-place approach.</div>
+            <pre><code><span class="c-type">String</span> reverseWords(<span class="c-type">String</span> s) {
+    <span class="c-type">String</span>[] words = s.trim().split(<span class="c-string">"\\s+"</span>); <span class="c-comment">// \\s+ = multiple spaces</span>
+    <span class="c-keyword">int</span> left = 0, right = words.length - 1;
+    <span class="c-keyword">while</span> (left < right) {
+        <span class="c-type">String</span> tmp = words[left];
+        words[left++] = words[right];
+        words[right--] = tmp;
+    }
+    <span class="c-keyword">return</span> <span class="c-type">String</span>.join(<span class="c-string">" "</span>, words);
+}</code></pre>
+            <div class="q-footer">
+              <div class="q-tc">Time <span>O(n)</span></div>
+              <div class="q-sc">Space <span>O(n)</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MEDIUM DIVIDER -->
+      <div class="diff-divider" data-reveal>
+        <span class="diff-label">Medium</span>
+        <span class="diff-line"></span>
+        <span class="badge badge-medium">Q6 – Q12</span>
+      </div>
+
+      <!-- Q6 -->
+      <div class="question-block" data-reveal>
+        <div class="q-header">
+          <div class="q-num">06</div>
+          <div class="q-meta">
+            <div class="q-top">
+              <span class="q-title">Remove Adjacent Duplicates</span>
+              <span class="badge badge-medium">Medium</span>
+              <span class="badge badge-xperi">Xperi Asked</span>
+            </div>
+            <p class="q-problem">String mein adjacent duplicate characters remove karo. Example: "akcddcef" → "akef" (dd remove → "akccef" → cc remove → "akef")</p>
+            <div class="q-section-label">Approach</div>
+            <div class="q-approach">Stack — har character peek se compare karo. Same hai toh pop karo (cancel). Different hai toh push karo. End mein stack se result banao.</div>
+            <pre><code><span class="c-type">String</span> removeDuplicates(<span class="c-type">String</span> s) {
+    <span class="c-type">Stack</span>&lt;<span class="c-type">Character</span>&gt; stack = <span class="c-keyword">new</span> <span class="c-type">Stack</span>&lt;&gt;();
+    <span class="c-keyword">for</span> (<span class="c-keyword">char</span> c : s.toCharArray()) {
+        <span class="c-keyword">if</span> (!stack.isEmpty() && stack.peek() == c)
+            stack.pop();   <span class="c-comment">// adjacent match → cancel!</span>
+        <span class="c-keyword">else</span>
+            stack.push(c);
+    }
+    <span class="c-type">StringBuilder</span> sb = <span class="c-keyword">new</span> <span class="c-type">StringBuilder</span>();
+    <span class="c-keyword">for</span> (<span class="c-keyword">char</span> c : stack) sb.append(c);
+    <span class="c-keyword">return</span> sb.toString();
+}
+<span class="c-comment">// "akcddcef" → stack: a,k,c,d → d cancels → k,c,c → c cancels → a,k → e,f</span>
+<span class="c-comment">// Result: "akef" ✓</span></code></pre>
+            <div class="q-footer">
+              <div class="q-tc">Time <span>O(n)</span></div>
+              <div class="q-sc">Space <span>O(n)</span></div>
+            </div>
+            <div class="q-tip">Exactly Xperi ka question — "akcddcef" — yeh example bolo! Stack ka LIFO nature adjacent cancellation ke liye perfect hai.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q7 -->
+      <div class="question-block" data-reveal>
+        <div class="q-header">
+          <div class="q-num">07</div>
+          <div class="q-meta">
+            <div class="q-top">
+              <span class="q-title">Longest Substring Without Repeating Characters</span>
+              <span class="badge badge-medium">Medium</span>
+            </div>
+            <p class="q-problem">String mein longest substring without repeating characters ki length nikalo.</p>
+            <div class="q-section-label">Approach</div>
+            <div class="q-approach">Sliding Window + HashMap — right expand karo, jab duplicate mile left ko us character ke baad shrink karo.</div>
+            <pre><code><span class="c-keyword">int</span> lengthOfLongestSubstring(<span class="c-type">String</span> s) {
+    <span class="c-type">Map</span>&lt;<span class="c-type">Character</span>, <span class="c-type">Integer</span>&gt; map = <span class="c-keyword">new</span> <span class="c-type">HashMap</span>&lt;&gt;();
+    <span class="c-keyword">int</span> maxLen = 0, left = 0;
+    <span class="c-keyword">for</span> (<span class="c-keyword">int</span> right = 0; right < s.length(); right++) {
+        <span class="c-keyword">char</span> c = s.charAt(right);
+        <span class="c-keyword">if</span> (map.containsKey(c))
+            left = Math.max(left, map.get(c) + 1); <span class="c-comment">// shrink</span>
+        map.put(c, right);
+        maxLen = Math.max(maxLen, right - left + 1);
+    }
+    <span class="c-keyword">return</span> maxLen;
+}
+<span class="c-comment">// "abcabcbb" → 3 ("abc")</span></code></pre>
+            <div class="q-footer">
+              <div class="q-tc">Time <span>O(n)</span></div>
+              <div class="q-sc">Space <span>O(k)</span> — k = charset size</div>
+            </div>
+            <div class="q-tip">left = Math.max(left, ...) — yeh line important hai. Left ko kabhi peeche mat jaane do!</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q8 -->
+      <div class="question-block" data-reveal>
+        <div class="q-header">
+          <div class="q-num">08</div>
+          <div class="q-meta">
+            <div class="q-top">
+              <span class="q-title">Valid Parentheses</span>
+              <span class="badge badge-medium">Medium</span>
+            </div>
+            <p class="q-problem">String mein brackets balanced hain ya nahi check karo — '(', ')', '{', '}', '[', ']'</p>
+            <div class="q-section-label">Approach</div>
+            <div class="q-approach">Stack — opening bracket push karo. Closing bracket pe: stack empty hai ya top match nahi karta toh false. End mein stack empty hona chahiye.</div>
+            <pre><code><span class="c-keyword">boolean</span> isValid(<span class="c-type">String</span> s) {
+    <span class="c-type">Stack</span>&lt;<span class="c-type">Character</span>&gt; stack = <span class="c-keyword">new</span> <span class="c-type">Stack</span>&lt;&gt;();
+    <span class="c-keyword">for</span> (<span class="c-keyword">char</span> c : s.toCharArray()) {
+        <span class="c-keyword">if</span> (c == <span class="c-string">'('</span> || c == <span class="c-string">'{'</span> || c == <span class="c-string">'['</span>)
+            stack.push(c);
+        <span class="c-keyword">else</span> {
+            <span class="c-keyword">if</span> (stack.isEmpty()) <span class="c-keyword">return false</span>;
+            <span class="c-keyword">char</span> top = stack.pop();
+            <span class="c-keyword">if</span> (c == <span class="c-string">')'</span> && top != <span class="c-string">'('</span>) <span class="c-keyword">return false</span>;
+            <span class="c-keyword">if</span> (c == <span class="c-string">'}'</span> && top != <span class="c-string">'{'</span>) <span class="c-keyword">return false</span>;
+            <span class="c-keyword">if</span> (c == <span class="c-string">']'</span> && top != <span class="c-string">'['</span>) <span class="c-keyword">return false</span>;
+        }
+    }
+    <span class="c-keyword">return</span> stack.isEmpty();
+}</code></pre>
+            <div class="q-footer">
+              <div class="q-tc">Time <span>O(n)</span></div>
+              <div class="q-sc">Space <span>O(n)</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q9 -->
+      <div class="question-block" data-reveal>
+        <div class="q-header">
+          <div class="q-num">09</div>
+          <div class="q-meta">
+            <div class="q-top">
+              <span class="q-title">Group Anagrams</span>
+              <span class="badge badge-medium">Medium</span>
+            </div>
+            <p class="q-problem">Strings ki list mein anagrams group karo. ["eat","tea","tan","ate","nat","bat"] → [["bat"],["nat","tan"],["ate","eat","tea"]]</p>
+            <div class="q-section-label">Approach</div>
+            <div class="q-approach">HashMap with sorted string as key — anagrams ka sorted form same hoga. Map mein group karte jao.</div>
+            <pre><code><span class="c-type">List</span>&lt;<span class="c-type">List</span>&lt;<span class="c-type">String</span>&gt;&gt; groupAnagrams(<span class="c-type">String</span>[] strs) {
+    <span class="c-type">Map</span>&lt;<span class="c-type">String</span>, <span class="c-type">List</span>&lt;<span class="c-type">String</span>&gt;&gt; map = <span class="c-keyword">new</span> <span class="c-type">HashMap</span>&lt;&gt;();
+    <span class="c-keyword">for</span> (<span class="c-type">String</span> s : strs) {
+        <span class="c-keyword">char</span>[] ch = s.toCharArray();
+        Arrays.sort(ch);
+        <span class="c-type">String</span> key = <span class="c-keyword">new</span> <span class="c-type">String</span>(ch); <span class="c-comment">// sorted key</span>
+        map.computeIfAbsent(key, k -> <span class="c-keyword">new</span> <span class="c-type">ArrayList</span>&lt;&gt;()).add(s);
+    }
+    <span class="c-keyword">return</span> <span class="c-keyword">new</span> <span class="c-type">ArrayList</span>&lt;&gt;(map.values());
+}</code></pre>
+            <div class="q-footer">
+              <div class="q-tc">Time <span>O(n·k log k)</span></div>
+              <div class="q-sc">Space <span>O(n·k)</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q10 -->
+      <div class="question-block" data-reveal>
+        <div class="q-header">
+          <div class="q-num">10</div>
+          <div class="q-meta">
+            <div class="q-top">
+              <span class="q-title">Longest Palindromic Substring</span>
+              <span class="badge badge-medium">Medium</span>
+            </div>
+            <p class="q-problem">String mein longest palindromic substring nikalo. "babad" → "bab" ya "aba".</p>
+            <div class="q-section-label">Approach</div>
+            <div class="q-approach">Expand Around Center — har character aur har pair ko center manke expand karo. Odd (single center) aur Even (pair) dono cases handle karo.</div>
+            <pre><code><span class="c-type">String</span> longestPalindrome(<span class="c-type">String</span> s) {
+    <span class="c-keyword">int</span> start = 0, maxLen = 1;
+    <span class="c-keyword">for</span> (<span class="c-keyword">int</span> i = 0; i < s.length(); i++) {
+        <span class="c-comment">// Odd length palindrome (single center)</span>
+        <span class="c-keyword">int</span> len1 = expand(s, i, i);
+        <span class="c-comment">// Even length palindrome (pair center)</span>
+        <span class="c-keyword">int</span> len2 = expand(s, i, i + 1);
+        <span class="c-keyword">int</span> len = Math.max(len1, len2);
+        <span class="c-keyword">if</span> (len > maxLen) {
+            maxLen = len;
+            start = i - (len - 1) / 2;
+        }
+    }
+    <span class="c-keyword">return</span> s.substring(start, start + maxLen);
+}
+
+<span class="c-keyword">int</span> expand(<span class="c-type">String</span> s, <span class="c-keyword">int</span> l, <span class="c-keyword">int</span> r) {
+    <span class="c-keyword">while</span> (l >= 0 && r < s.length() && s.charAt(l) == s.charAt(r)) {
+        l--; r++;
+    }
+    <span class="c-keyword">return</span> r - l - 1; <span class="c-comment">// length of palindrome</span>
+}</code></pre>
+            <div class="q-footer">
+              <div class="q-tc">Time <span>O(n²)</span></div>
+              <div class="q-sc">Space <span>O(1)</span></div>
+            </div>
+            <div class="q-tip">Odd vs Even dono cases alag handle karo — common mistake ek hi bhool jaana hai!</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q11 -->
+      <div class="question-block" data-reveal>
+        <div class="q-header">
+          <div class="q-num">11</div>
+          <div class="q-meta">
+            <div class="q-top">
+              <span class="q-title">String Compression</span>
+              <span class="badge badge-medium">Medium</span>
+            </div>
+            <p class="q-problem">Character array compress karo in-place — "aaabbbcc" → "a3b3c2". Agar single char toh count mat likho.</p>
+            <div class="q-section-label">Approach</div>
+            <div class="q-approach">Two pointer — read pointer se scan karo, write pointer se result likho. Consecutive same chars count karo.</div>
+            <pre><code><span class="c-keyword">int</span> compress(<span class="c-keyword">char</span>[] chars) {
+    <span class="c-keyword">int</span> write = 0, i = 0;
+    <span class="c-keyword">while</span> (i < chars.length) {
+        <span class="c-keyword">char</span> cur = chars[i];
+        <span class="c-keyword">int</span> count = 0;
+        <span class="c-keyword">while</span> (i < chars.length && chars[i] == cur) { i++; count++; }
+        chars[write++] = cur;
+        <span class="c-keyword">if</span> (count > 1) {
+            <span class="c-keyword">for</span> (<span class="c-keyword">char</span> c : <span class="c-type">String</span>.valueOf(count).toCharArray())
+                chars[write++] = c;
+        }
+    }
+    <span class="c-keyword">return</span> write;
+}</code></pre>
+            <div class="q-footer">
+              <div class="q-tc">Time <span>O(n)</span></div>
+              <div class="q-sc">Space <span>O(1)</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q12 -->
+      <div class="question-block" data-reveal>
+        <div class="q-header">
+          <div class="q-num">12</div>
+          <div class="q-meta">
+            <div class="q-top">
+              <span class="q-title">Minimum Window Substring</span>
+              <span class="badge badge-medium">Medium</span>
+            </div>
+            <p class="q-problem">s mein t ke sab characters contain karne wala smallest substring nikalo.</p>
+            <div class="q-section-label">Approach</div>
+            <div class="q-approach">Sliding Window + two frequency maps — window expand karo jab tak sab chars cover ho jayein, phir shrink karo minimum window ke liye.</div>
+            <pre><code><span class="c-type">String</span> minWindow(<span class="c-type">String</span> s, <span class="c-type">String</span> t) {
+    <span class="c-type">Map</span>&lt;<span class="c-type">Character</span>, <span class="c-type">Integer</span>&gt; need = <span class="c-keyword">new</span> <span class="c-type">HashMap</span>&lt;&gt;();
+    <span class="c-keyword">for</span> (<span class="c-keyword">char</span> c : t.toCharArray()) need.merge(c, 1, Integer::sum);
+    <span class="c-keyword">int</span> left=0, minL=0, minLen=<span class="c-type">Integer</span>.MAX_VALUE, formed=0;
+    <span class="c-keyword">int</span> required = need.size();
+    <span class="c-type">Map</span>&lt;<span class="c-type">Character</span>, <span class="c-type">Integer</span>&gt; win = <span class="c-keyword">new</span> <span class="c-type">HashMap</span>&lt;&gt;();
+    <span class="c-keyword">for</span> (<span class="c-keyword">int</span> right = 0; right < s.length(); right++) {
+        <span class="c-keyword">char</span> c = s.charAt(right);
+        win.merge(c, 1, Integer::sum);
+        <span class="c-keyword">if</span> (need.containsKey(c) && win.get(c).equals(need.get(c))) formed++;
+        <span class="c-keyword">while</span> (formed == required) {
+            <span class="c-keyword">if</span> (right - left + 1 < minLen) { minLen = right-left+1; minL = left; }
+            <span class="c-keyword">char</span> lc = s.charAt(left++);
+            win.merge(lc, -1, Integer::sum);
+            <span class="c-keyword">if</span> (need.containsKey(lc) && win.get(lc) < need.get(lc)) formed--;
+        }
+    }
+    <span class="c-keyword">return</span> minLen == <span class="c-type">Integer</span>.MAX_VALUE ? <span class="c-string">""</span> : s.substring(minL, minL+minLen);
+}</code></pre>
+            <div class="q-footer">
+              <div class="q-tc">Time <span>O(|s| + |t|)</span></div>
+              <div class="q-sc">Space <span>O(|s| + |t|)</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HARD DIVIDER -->
+      <div class="diff-divider" data-reveal>
+        <span class="diff-label">Hard</span>
+        <span class="diff-line"></span>
+        <span class="badge badge-hard">Q13 – Q15</span>
+      </div>
+
+      <!-- Q13 -->
+      <div class="question-block" data-reveal>
+        <div class="q-header">
+          <div class="q-num">13</div>
+          <div class="q-meta">
+            <div class="q-top">
+              <span class="q-title">Min Deletions to Make Palindrome</span>
+              <span class="badge badge-hard">Hard</span>
+              <span class="badge badge-xperi">Xperi Asked</span>
+            </div>
+            <p class="q-problem">Ek string se minimum characters delete karo taaki palindrome ban jaaye. s = "agbcba" → 1 (delete 'g' → "abcba")</p>
+            <div class="q-section-label">Approach</div>
+            <div class="q-approach">LCS Pattern — min deletions = len(s) - LCS(s, reverse(s)). LCS (Longest Common Subsequence) nikalo s aur uske reverse ke beech.</div>
+            <pre><code><span class="c-keyword">int</span> minDeletions(<span class="c-type">String</span> s) {
+    <span class="c-type">String</span> rev = <span class="c-keyword">new</span> <span class="c-type">StringBuilder</span>(s).reverse().toString();
+    <span class="c-keyword">int</span> n = s.length();
+    <span class="c-comment">// DP for LCS between s and its reverse</span>
+    <span class="c-keyword">int</span>[][] dp = <span class="c-keyword">new</span> <span class="c-keyword">int</span>[n+1][n+1];
+    <span class="c-keyword">for</span> (<span class="c-keyword">int</span> i = 1; i <= n; i++) {
+        <span class="c-keyword">for</span> (<span class="c-keyword">int</span> j = 1; j <= n; j++) {
+            <span class="c-keyword">if</span> (s.charAt(i-1) == rev.charAt(j-1))
+                dp[i][j] = 1 + dp[i-1][j-1];
+            <span class="c-keyword">else</span>
+                dp[i][j] = Math.max(dp[i-1][j], dp[i][j-1]);
+        }
+    }
+    <span class="c-keyword">int</span> lcs = dp[n][n]; <span class="c-comment">// longest palindromic subsequence</span>
+    <span class="c-keyword">return</span> n - lcs;    <span class="c-comment">// deletions = total - lps</span>
+}
+<span class="c-comment">// "agbcba": LPS = "abcba" (len 5), deletions = 6 - 5 = 1 ✓</span></code></pre>
+            <div class="q-footer">
+              <div class="q-tc">Time <span>O(n²)</span></div>
+              <div class="q-sc">Space <span>O(n²)</span></div>
+            </div>
+            <div class="q-tip">Yeh EXACTLY Xperi ka question hai — s = "agbcba". LCS insight yahan key hai: LCS(s, reverse(s)) = Longest Palindromic Subsequence. Yeh insight bologe toh interviewer impressed hoga!</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q14 -->
+      <div class="question-block" data-reveal>
+        <div class="q-header">
+          <div class="q-num">14</div>
+          <div class="q-meta">
+            <div class="q-top">
+              <span class="q-title">Decode Ways</span>
+              <span class="badge badge-hard">Hard</span>
+            </div>
+            <p class="q-problem">'A'=1 ... 'Z'=26 encoding hai. Digit string ko kitne taaron mein decode kar sakte hain? "226" → 3 ("BZ"/"VF"/"BBF")</p>
+            <div class="q-section-label">Approach</div>
+            <div class="q-approach">1D DP — dp[i] = string[0..i-1] ke kitne decode ways hain. Har position pe single digit aur two digit dono check karo.</div>
+            <pre><code><span class="c-keyword">int</span> numDecodings(<span class="c-type">String</span> s) {
+    <span class="c-keyword">int</span> n = s.length();
+    <span class="c-keyword">if</span> (s.charAt(0) == <span class="c-string">'0'</span>) <span class="c-keyword">return</span> 0;
+    <span class="c-keyword">int</span>[] dp = <span class="c-keyword">new</span> <span class="c-keyword">int</span>[n + 1];
+    dp[0] = 1; dp[1] = 1;
+    <span class="c-keyword">for</span> (<span class="c-keyword">int</span> i = 2; i <= n; i++) {
+        <span class="c-keyword">int</span> one = s.charAt(i-1) - <span class="c-string">'0'</span>;
+        <span class="c-keyword">int</span> two = Integer.parseInt(s.substring(i-2, i));
+        <span class="c-keyword">if</span> (one >= 1) dp[i] += dp[i-1]; <span class="c-comment">// valid single digit</span>
+        <span class="c-keyword">if</span> (two >= 10 && two <= 26) dp[i] += dp[i-2]; <span class="c-comment">// valid two digit</span>
+    }
+    <span class="c-keyword">return</span> dp[n];
+}</code></pre>
+            <div class="q-footer">
+              <div class="q-tc">Time <span>O(n)</span></div>
+              <div class="q-sc">Space <span>O(n)</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q15 -->
+      <div class="question-block" data-reveal>
+        <div class="q-header">
+          <div class="q-num">15</div>
+          <div class="q-meta">
+            <div class="q-top">
+              <span class="q-title">Longest Repeating Character Replacement</span>
+              <span class="badge badge-hard">Hard</span>
+            </div>
+            <p class="q-problem">String mein at most k characters replace karke sabse lamba same-character substring nikalo. "AABABBA", k=1 → 4</p>
+            <div class="q-section-label">Approach</div>
+            <div class="q-approach">Sliding Window — window valid hai agar (window size - max freq char count) ≤ k. Invalid hone pe left shrink karo.</div>
+            <pre><code><span class="c-keyword">int</span> characterReplacement(<span class="c-type">String</span> s, <span class="c-keyword">int</span> k) {
+    <span class="c-keyword">int</span>[] freq = <span class="c-keyword">new</span> <span class="c-keyword">int</span>[26];
+    <span class="c-keyword">int</span> left = 0, maxFreq = 0, maxLen = 0;
+    <span class="c-keyword">for</span> (<span class="c-keyword">int</span> right = 0; right < s.length(); right++) {
+        freq[s.charAt(right) - <span class="c-string">'A'</span>]++;
+        maxFreq = Math.max(maxFreq, freq[s.charAt(right) - <span class="c-string">'A'</span>]);
+        <span class="c-comment">// window invalid: chars to replace > k</span>
+        <span class="c-keyword">if</span> (right - left + 1 - maxFreq > k) {
+            freq[s.charAt(left) - <span class="c-string">'A'</span>]--;
+            left++;
+        }
+        maxLen = Math.max(maxLen, right - left + 1);
+    }
+    <span class="c-keyword">return</span> maxLen;
+}</code></pre>
+            <div class="q-footer">
+              <div class="q-tc">Time <span>O(n)</span></div>
+              <div class="q-sc">Space <span>O(1)</span></div>
+            </div>
+            <div class="q-tip">Key insight: (window_size - max_freq) = minimum replacements needed. Agar yeh &gt; k hai toh window shrink karo.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Cheatsheet -->
+<section class="section" id="cheatsheet">
+  <div class="section-inner">
+    <div class="section-eyebrow" data-reveal>04 — Quick Reference</div>
+    <h2 data-reveal data-delay="1">Pattern → Problem<br>Mapping.</h2>
+
+    <div class="cheat-grid">
+      <div class="cheat-card" data-reveal data-delay="1">
+        <div class="cheat-problem">Reverse String</div>
+        <div class="cheat-pattern">Two Pointers (swap)</div>
+        <div class="cheat-tc">O(n) time · O(1) space</div>
+      </div>
+      <div class="cheat-card" data-reveal data-delay="2">
+        <div class="cheat-problem">Valid Palindrome</div>
+        <div class="cheat-pattern">Two Pointers (skip non-alnum)</div>
+        <div class="cheat-tc">O(n) time · O(1) space</div>
+      </div>
+      <div class="cheat-card" data-reveal data-delay="3">
+        <div class="cheat-problem">Valid Anagram</div>
+        <div class="cheat-pattern">Frequency Array [26]</div>
+        <div class="cheat-tc">O(n) time · O(1) space</div>
+      </div>
+      <div class="cheat-card" data-reveal data-delay="1">
+        <div class="cheat-problem">First Unique Char</div>
+        <div class="cheat-pattern">Two-pass frequency</div>
+        <div class="cheat-tc">O(n) time · O(1) space</div>
+      </div>
+      <div class="cheat-card" data-reveal data-delay="2">
+        <div class="cheat-problem">Remove Adj Duplicates ★</div>
+        <div class="cheat-pattern">Stack (peek + pop)</div>
+        <div class="cheat-tc">O(n) time · O(n) space</div>
+      </div>
+      <div class="cheat-card" data-reveal data-delay="3">
+        <div class="cheat-problem">Valid Parentheses</div>
+        <div class="cheat-pattern">Stack (match pairs)</div>
+        <div class="cheat-tc">O(n) time · O(n) space</div>
+      </div>
+      <div class="cheat-card" data-reveal data-delay="1">
+        <div class="cheat-problem">Longest No Repeat</div>
+        <div class="cheat-pattern">Sliding Window + HashMap</div>
+        <div class="cheat-tc">O(n) time · O(k) space</div>
+      </div>
+      <div class="cheat-card" data-reveal data-delay="2">
+        <div class="cheat-problem">Min Window Substring</div>
+        <div class="cheat-pattern">Sliding Window (two maps)</div>
+        <div class="cheat-tc">O(n) time · O(n) space</div>
+      </div>
+      <div class="cheat-card" data-reveal data-delay="3">
+        <div class="cheat-problem">Group Anagrams</div>
+        <div class="cheat-pattern">HashMap (sorted key)</div>
+        <div class="cheat-tc">O(n·k log k) · O(nk)</div>
+      </div>
+      <div class="cheat-card" data-reveal data-delay="1">
+        <div class="cheat-problem">Longest Palindromic Substr</div>
+        <div class="cheat-pattern">Expand Around Center</div>
+        <div class="cheat-tc">O(n²) time · O(1) space</div>
+      </div>
+      <div class="cheat-card" data-reveal data-delay="2">
+        <div class="cheat-problem">Min Deletions Palindrome ★</div>
+        <div class="cheat-pattern">String DP (LCS pattern)</div>
+        <div class="cheat-tc">O(n²) time · O(n²) space</div>
+      </div>
+      <div class="cheat-card" data-reveal data-delay="3">
+        <div class="cheat-problem">Char Replacement (k ops)</div>
+        <div class="cheat-pattern">Sliding Window (maxFreq)</div>
+        <div class="cheat-tc">O(n) time · O(1) space</div>
+      </div>
+    </div>
+
+    <div style="margin-top: 4rem; border-top: 1px solid var(--faint); padding-top: 3rem;" data-reveal>
+      <div class="section-eyebrow">Golden Rules for Xperi</div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem; margin-top: 1.5rem;">
+        <div class="q-approach">★ marks Xperi-confirmed questions. Dono ke examples yaad rakh: "akcddcef" aur "agbcba".</div>
+        <div class="q-approach">StringBuilder use karo — never String + in loop. O(n) vs O(n²) difference bolo.</div>
+        <div class="q-approach">Sliding window mein left kabhi peeche nahi jaata — Math.max(left, ...) trick.</div>
+        <div class="q-approach">Anagram problems mein freq array [26] HashMap se faster hai lowercase ke liye.</div>
+        <div class="q-approach">LCS(s, reverse(s)) = Longest Palindromic Subsequence — yeh insight sab ko impress karta hai.</div>
+        <div class="q-approach">Odd + Even palindrome centers dono handle karo expand-around-center mein.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer data-reveal>
+  <div class="footer-name">Pritam Mandal</div>
+  <div class="footer-right">
+    <p>KIIT University — CSE 2027</p>
+    <p style="color: var(--accent)">mandalpritam.dev</p>
+    <p>Xperi Interview — June 16–17, 2026</p>
+  </div>
+</footer>
+
+<script>
+// Scroll reveal
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in-view'); });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('[data-reveal]').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
